@@ -1,0 +1,22 @@
+name: 'Credentials scanning'
+description: 'Scan source code to find if credentials have been hardcoded'
+inputs:
+  folderToScan:  
+    description: 'The folder where to scan files'
+    required: true
+    default: '/src'
+outputs:
+  scanned-files: 
+    description: "Number of files scanned"
+    value: ${{ steps.count-files.outputs.filesCount }}
+runs:
+  using: "composite"
+  steps: 
+    - run: grep "password" . -R > ../result.txt
+      shell: bash
+      working-directory: ${{ inputs.folderToScan }}
+    - id: count-files
+      run: |
+         COUNT=$(wc -l < result.txt)
+         echo "::set-output name=filesCount::$(echo $COUNT)"
+      shell: bash
